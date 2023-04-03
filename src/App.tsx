@@ -1,21 +1,65 @@
-import React from "react";
-import logo from "./logo.svg";
+import React, { useEffect } from "react";
 import "./App.css";
 import Webcam from "react-webcam";
 import { Button, Dialog, DialogTitle, Stack, Typography } from "@mui/material";
-import BackgroundCard from "./Components/Backgrounds/BackgroundCard";
-import Backgrounds from "./Components/Backgrounds/Backgrounds";
+import BackgroundDialog from "./Components/Backgrounds/BackgroundDialog";
+import OutputDialog from "./Components/Output/OutputDialog";
+import { OBSCommand } from "./hooks/OBSCommand";
 
 const videoConstraints = {
   width: 1280,
   height: 720,
+  deviceId: "007a17015a7042f7c22069ed778977108e600c670d05a0d675fbd68495adf767",
 };
 
 function App() {
-  const [open, setOpen] = React.useState(false);
+  const [backgroundsDialogOpen, setBackgroundsDialogOpen] =
+    React.useState(false);
 
-  const handleClose = () => {
-    setOpen(false);
+  const [outputDialogOpen, setOutputDialogOpen] = React.useState(false);
+
+  const [countDown, setCountDown] = React.useState(10);
+  const [isRunning, setIsRunning] = React.useState(false);
+
+  const handleBackgroundDialogClose = () => {
+    setBackgroundsDialogOpen(false);
+  };
+
+  const handleOutputDialogClose = () => {
+    setOutputDialogOpen(false);
+  };
+
+  //console.log(navigator.mediaDevices.enumerateDevices());
+
+  //const obs = useObsSocket();
+
+  const takeImage = () => {
+    // obs.call("TriggerHotkeyByName", {
+    //   hotkeyName: "OBSBasic.Screenshot",
+    // });
+    OBSCommand("TriggerHotkeyByName", {
+      hotkeyName: "OBSBasic.Screenshot",
+    });
+  };
+
+  useEffect(() => {
+    if (isRunning) {
+      setTimeout(() => {
+        if (countDown === 1) {
+          setIsRunning(false);
+          setCountDown(10);
+          takeImage();
+          setOutputDialogOpen(true);
+        } else {
+          setCountDown((prevCount) => prevCount - 1);
+        }
+      }, 100);
+    }
+  }, [isRunning, countDown, takeImage, outputDialogOpen]);
+
+  const handleScreenshot = () => {
+    setIsRunning(true);
+    //takeImage();
   };
 
   return (
@@ -29,30 +73,33 @@ function App() {
         rowGap={"1rem"}
       >
         <Webcam videoConstraints={videoConstraints} />
-        <Button variant="contained" onClick={() => setOpen(true)}>
-          Change Scene
-        </Button>
-      </Stack>
-      <Dialog
-        fullScreen
-        open={open}
-        onClose={handleClose}
-        //TransitionComponent={Transition}
-      >
-        <DialogTitle
-          sx={{
-            display: "flex",
-            justifyContent: "center",
-            border: "1px red solid",
+        <Button
+          variant="contained"
+          onClick={(evt) => {
+            evt.preventDefault();
+            setBackgroundsDialogOpen(true);
           }}
         >
-          <Typography variant="h2" component="h3">
-            Change Scene
-          </Typography>
-          <Button onClick={() => setOpen(false)}>Close</Button>
-        </DialogTitle>
-        <Backgrounds />
-      </Dialog>
+          Change Scene
+        </Button>
+        <Button
+          variant="contained"
+          onClick={(evt) => {
+            evt.preventDefault();
+            handleScreenshot();
+          }}
+        >
+          Take Image
+        </Button>
+        <Typography variant="h2" component="p" sx={{ textAlign: "center" }}>
+          Count Down: {countDown}
+        </Typography>
+      </Stack>
+      <BackgroundDialog
+        open={backgroundsDialogOpen}
+        onClose={handleBackgroundDialogClose}
+      />
+      <OutputDialog open={outputDialogOpen} onClose={handleOutputDialogClose} />
     </>
   );
 }

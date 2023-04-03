@@ -1,34 +1,44 @@
 import React from "react";
 import { Card, CardContent, CardMedia, Typography } from "@mui/material";
 import OBSWebSocket from "obs-websocket-js";
+import { useObsSocket } from "../../hooks/useObsSocket";
 
 type BackgroundCardProps = {
   title: string;
   image: string;
+  sceneItemId: number;
+  onDialogClose: () => void;
 };
-
-const obs = new OBSWebSocket();
-
-// try {
-//   const { obsWebSocketVersion, negotiatedRpcVersion } = await obs.connect();
-//   console.log(
-//     `Connected to server ${obsWebSocketVersion} (using RPC ${negotiatedRpcVersion})`
-//   );
-// } catch (error) {
-//   console.error("Failed to connect", error.code, error.message);
-// }
 
 const screenCaptureConfig = {
   requestType: "GetHotkeyList",
 };
 
-const BackgroundCard: React.FC<BackgroundCardProps> = ({ title, image }) => {
+const changeBackgroundConfig = {
+  requestType: "SetSceneItemEnabled",
+  requestData: {
+    sceneName: "Jungle Scene",
+    sceneItemId: 2,
+    sceneItemEnabled: false,
+  },
+};
+
+const BackgroundCard: React.FC<BackgroundCardProps> = ({
+  title,
+  image,
+  sceneItemId,
+  onDialogClose,
+}) => {
+  //const obs = useObsSocket();
+
   const changeBackgroundHandler = (backgroundImage: string) => {
-    //here i will change the background of the OBS scene
-    console.log("background changed to: ", backgroundImage);
-    // obs.call("TriggerHotkeyByName", {
-    //   hotkeyName: "OBSBasic.Screenshot",
+    // obs.call("SetSceneItemIndex", {
+    //   sceneName: "Prime Scene",
+    //   sceneItemId: sceneItemId,
+    //   sceneItemIndex: 3,
     // });
+
+    onDialogClose();
   };
 
   return (
@@ -36,7 +46,7 @@ const BackgroundCard: React.FC<BackgroundCardProps> = ({ title, image }) => {
       <CardMedia
         image={image}
         title={title}
-        sx={{ width: 1, height: "10rem" }}
+        sx={{ width: 1, height: "10rem", cursor: "pointer" }}
         onClick={() => changeBackgroundHandler(image)}
       />
       <CardContent>
