@@ -9,25 +9,29 @@ import { Stack } from "@mui/material";
 type BackgroundData = {
   image: string;
   title: string;
-  sceneItemId: number;
+  imageName: string;
 };
 
 const backgroundData: BackgroundData[] = [
   {
     image: background1,
     title: "Background One",
-    sceneItemId: 4,
+    imageName: "background1",
   },
   {
     image: background2,
     title: "Background Two",
-    sceneItemId: 5,
+    imageName: "background2",
   },
-  { image: background3, title: "Background Three", sceneItemId: 6 },
+  {
+    image: background3,
+    title: "Background Three",
+    imageName: "background3",
+  },
   {
     image: background4,
     title: "Background Four",
-    sceneItemId: 7,
+    imageName: "background4",
   },
 ];
 
@@ -43,8 +47,8 @@ const Backgrounds: React.FC<BackgroundsProps> = ({ onDialogClose }) => {
           key={background.title}
           title={background.title}
           image={background.image}
-          sceneItemId={background.sceneItemId}
           onDialogClose={onDialogClose}
+          imageName={background.imageName}
         />
       ))}
     </Stack>

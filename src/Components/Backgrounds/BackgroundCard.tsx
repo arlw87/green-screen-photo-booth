@@ -2,52 +2,54 @@ import React from "react";
 import { Card, CardContent, CardMedia, Typography } from "@mui/material";
 import OBSWebSocket from "obs-websocket-js";
 import { useObsSocket } from "../../hooks/useObsSocket";
+import { useMutation } from "react-query";
 
 type BackgroundCardProps = {
   title: string;
   image: string;
-  sceneItemId: number;
   onDialogClose: () => void;
-};
-
-const screenCaptureConfig = {
-  requestType: "GetHotkeyList",
-};
-
-const changeBackgroundConfig = {
-  requestType: "SetSceneItemEnabled",
-  requestData: {
-    sceneName: "Jungle Scene",
-    sceneItemId: 2,
-    sceneItemEnabled: false,
-  },
+  imageName: string;
 };
 
 const BackgroundCard: React.FC<BackgroundCardProps> = ({
   title,
   image,
-  sceneItemId,
   onDialogClose,
+  imageName,
 }) => {
   //const obs = useObsSocket();
+  const changeBackground = useMutation(
+    async (backgroundName: string) => {
+      const response = await fetch(
+        `http://localhost:4000/changebackground/${backgroundName}`
+      );
+      const jsonData = await response.json();
+      return jsonData;
+    },
+    {
+      onSuccess: (data) => {
+        console.log("Success: ", data);
+        onDialogClose();
+      },
+      onError: (error) => {
+        console.log("Error: ", error);
+      },
+    }
+  );
 
   const changeBackgroundHandler = (backgroundImage: string) => {
-    // obs.call("SetSceneItemIndex", {
-    //   sceneName: "Prime Scene",
-    //   sceneItemId: sceneItemId,
-    //   sceneItemIndex: 3,
-    // });
-
-    onDialogClose();
+    changeBackground.mutate(backgroundImage);
   };
+
+  console.log(`http://localhost:4000/backdrops/${imageName}.jpg`);
 
   return (
     <Card sx={{ width: "20rem" }}>
       <CardMedia
-        image={image}
+        image={`http://localhost:4000/backdrops/${imageName}.jpg`}
         title={title}
         sx={{ width: 1, height: "10rem", cursor: "pointer" }}
-        onClick={() => changeBackgroundHandler(image)}
+        onClick={() => changeBackgroundHandler(imageName)}
       />
       <CardContent>
         <Typography

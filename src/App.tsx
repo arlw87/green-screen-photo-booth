@@ -4,7 +4,7 @@ import Webcam from "react-webcam";
 import { Button, Dialog, DialogTitle, Stack, Typography } from "@mui/material";
 import BackgroundDialog from "./Components/Backgrounds/BackgroundDialog";
 import OutputDialog from "./Components/Output/OutputDialog";
-import { OBSCommand } from "./hooks/OBSCommand";
+import { useMutation } from "react-query";
 
 const videoConstraints = {
   width: 1280,
@@ -13,6 +13,28 @@ const videoConstraints = {
 };
 
 function App() {
+  const [outputImage, setOutputImage] = React.useState<string | null>(null);
+  const [countDownVisisble, setCountDownVisible] = React.useState(false);
+
+  //react query
+  const captureImage = useMutation(
+    async (data) => {
+      const response = await fetch("http://localhost:4000/screenshot");
+      const jsonData = await response.json();
+      return jsonData;
+    },
+    {
+      onSuccess: (data) => {
+        console.log("Success: ", data);
+        setOutputDialogOpen(true);
+        setOutputImage(data);
+      },
+      onError: (error) => {
+        console.log("Error: ", error);
+      },
+    }
+  );
+
   const [backgroundsDialogOpen, setBackgroundsDialogOpen] =
     React.useState(false);
 
@@ -31,15 +53,8 @@ function App() {
 
   //console.log(navigator.mediaDevices.enumerateDevices());
 
-  //const obs = useObsSocket();
-
   const takeImage = () => {
-    // obs.call("TriggerHotkeyByName", {
-    //   hotkeyName: "OBSBasic.Screenshot",
-    // });
-    OBSCommand("TriggerHotkeyByName", {
-      hotkeyName: "OBSBasic.Screenshot",
-    });
+    captureImage.mutate();
   };
 
   useEffect(() => {
@@ -48,18 +63,18 @@ function App() {
         if (countDown === 1) {
           setIsRunning(false);
           setCountDown(10);
+          setCountDownVisible(false);
           takeImage();
-          setOutputDialogOpen(true);
         } else {
           setCountDown((prevCount) => prevCount - 1);
         }
-      }, 100);
+      }, 1000);
     }
   }, [isRunning, countDown, takeImage, outputDialogOpen]);
 
   const handleScreenshot = () => {
     setIsRunning(true);
-    //takeImage();
+    setCountDownVisible(true);
   };
 
   return (
@@ -67,7 +82,7 @@ function App() {
       <Stack
         justifyContent={"center"}
         alignItems={"center"}
-        sx={{ border: "1px red solid" }}
+        sx={{ backgroundColor: "black" }}
         width={"100vw"}
         height={"100vh"}
         rowGap={"1rem"}
@@ -79,27 +94,54 @@ function App() {
             evt.preventDefault();
             setBackgroundsDialogOpen(true);
           }}
+          sx={{ position: "absolute", bottom: "1rem", left: "1rem", zIndex: 2 }}
         >
           Change Scene
         </Button>
         <Button
           variant="contained"
-          onClick={(evt) => {
-            evt.preventDefault();
+          onClick={() => {
             handleScreenshot();
+          }}
+          sx={{
+            position: "absolute",
+            bottom: "1rem",
+            right: "1rem",
+            zIndex: 2,
           }}
         >
           Take Image
         </Button>
-        <Typography variant="h2" component="p" sx={{ textAlign: "center" }}>
-          Count Down: {countDown}
-        </Typography>
+        <Stack
+          width={1}
+          height={1}
+          sx={{ position: "absolute" }}
+          justifyContent="center"
+          alignContent={"center"}
+        >
+          {countDownVisisble && (
+            <Typography
+              variant="h1"
+              component="p"
+              sx={{
+                textAlign: "center",
+                color: "white",
+              }}
+            >
+              {countDown}
+            </Typography>
+          )}
+        </Stack>
       </Stack>
       <BackgroundDialog
         open={backgroundsDialogOpen}
         onClose={handleBackgroundDialogClose}
       />
-      <OutputDialog open={outputDialogOpen} onClose={handleOutputDialogClose} />
+      <OutputDialog
+        open={outputDialogOpen}
+        onClose={handleOutputDialogClose}
+        imageName={outputImage}
+      />
     </>
   );
 }

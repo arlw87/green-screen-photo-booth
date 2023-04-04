@@ -1,17 +1,19 @@
 import { Button, Dialog, DialogTitle, Typography } from "@mui/material";
 import React, { useState } from "react";
-import { useLatestImage } from "../../hooks/useLatestImage";
 
 type OutputDialogProps = {
   open: boolean;
   onClose: () => void;
+  imageName: string | null;
 };
 
-const OutputDialog: React.FC<OutputDialogProps> = ({ open, onClose }) => {
+const OutputDialog: React.FC<OutputDialogProps> = ({
+  open,
+  onClose,
+  imageName = "No Image",
+}) => {
   // get the latest image from the output folder
-  const latestImage = useLatestImage();
   // console.log("Image Details", latestImage.image);
-  const imageName = "one.jpeg";
 
   return (
     <Dialog fullScreen open={open} onClose={onClose}>
@@ -38,13 +40,16 @@ const OutputDialog: React.FC<OutputDialogProps> = ({ open, onClose }) => {
           Close
         </Button>
       </DialogTitle>
-
-      {latestImage.loading && <Typography>Loading...</Typography>}
-      {!latestImage.loading && (
+      {imageName ? (
         <img
-          src={`http://localhost:4000/${imageName}`}
-          style={{ width: "600px", height: "400px" }}
+          src={imageName}
+          alt="captured image"
+          style={{ width: "100%", height: "100%" }}
         />
+      ) : (
+        <Typography variant="h2" component="p" sx={{ textAlign: "center" }}>
+          No Image
+        </Typography>
       )}
     </Dialog>
   );
