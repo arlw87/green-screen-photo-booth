@@ -1,15 +1,37 @@
 import React, { useEffect } from "react";
 import "./App.css";
 import Webcam from "react-webcam";
-import { Button, Dialog, DialogTitle, Stack, Typography } from "@mui/material";
+import { Button, Stack, Box } from "@mui/material";
+import PaletteIcon from "@mui/icons-material/Palette";
+import CameraAltIcon from "@mui/icons-material/CameraAlt";
 import BackgroundDialog from "./Components/Backgrounds/BackgroundDialog";
 import OutputDialog from "./Components/Output/OutputDialog";
 import { useMutation } from "react-query";
+import Layout from "./Components/Layout/Layout";
+import { styled } from "@mui/material/styles";
+import { keyframes } from "@mui/system";
+
+const scale = keyframes`
+  from {
+    transform: scale(3);
+  }
+  to {
+    transform: scale(0.5);
+  }
+`;
 
 const videoConstraints = {
-  width: 1280,
-  height: 720,
+  width: 1920,
+  height: 1080,
   deviceId: "007a17015a7042f7c22069ed778977108e600c670d05a0d675fbd68495adf767",
+};
+
+export const floatingButtonSX = {
+  position: "absolute",
+  zIndex: 2,
+  height: "8rem",
+  width: "8rem",
+  borderRadius: "50%",
 };
 
 function App() {
@@ -60,7 +82,7 @@ function App() {
   useEffect(() => {
     if (isRunning) {
       setTimeout(() => {
-        if (countDown === 1) {
+        if (countDown === 0) {
           setIsRunning(false);
           setCountDown(10);
           setCountDownVisible(false);
@@ -79,60 +101,92 @@ function App() {
 
   return (
     <>
-      <Stack
-        justifyContent={"center"}
-        alignItems={"center"}
-        sx={{ backgroundColor: "black" }}
-        width={"100vw"}
-        height={"100vh"}
-        rowGap={"1rem"}
-      >
-        <Webcam videoConstraints={videoConstraints} />
-        <Button
-          variant="contained"
-          onClick={(evt) => {
-            evt.preventDefault();
-            setBackgroundsDialogOpen(true);
-          }}
-          sx={{ position: "absolute", bottom: "1rem", left: "1rem", zIndex: 2 }}
-        >
-          Change Scene
-        </Button>
-        <Button
-          variant="contained"
-          onClick={() => {
-            handleScreenshot();
-          }}
-          sx={{
-            position: "absolute",
-            bottom: "1rem",
-            right: "1rem",
-            zIndex: 2,
-          }}
-        >
-          Take Image
-        </Button>
+      <Layout>
         <Stack
-          width={1}
-          height={1}
-          sx={{ position: "absolute" }}
-          justifyContent="center"
-          alignContent={"center"}
+          justifyContent={"center"}
+          direction="row"
+          alignItems={"center"}
+          width={"100vw"}
+          height={"100vh"}
         >
-          {countDownVisisble && (
-            <Typography
-              variant="h1"
-              component="p"
-              sx={{
-                textAlign: "center",
-                color: "white",
-              }}
-            >
-              {countDown}
-            </Typography>
-          )}
+          <Webcam
+            videoConstraints={videoConstraints}
+            style={{
+              height: "90%",
+              width: "90%",
+              border: "10px #788651 solid",
+              outline: "15px #6b7a40 solid",
+            }}
+          />
+          <Button
+            variant="contained"
+            color="secondary"
+            onClick={(evt) => {
+              evt.preventDefault();
+              setBackgroundsDialogOpen(true);
+            }}
+            sx={{
+              ...floatingButtonSX,
+              bottom: "1rem",
+              left: "1rem",
+            }}
+          >
+            <PaletteIcon
+              fontSize="large"
+              sx={{ height: "5rem", width: "5rem" }}
+            />
+          </Button>
+          <Button
+            variant="contained"
+            onClick={() => {
+              handleScreenshot();
+            }}
+            color="secondary"
+            sx={{
+              ...floatingButtonSX,
+              bottom: "1rem",
+              right: "1rem",
+            }}
+          >
+            <CameraAltIcon
+              fontSize="large"
+              sx={{ height: "5rem", width: "5rem" }}
+            />
+          </Button>
+          <Stack
+            width={1}
+            height={1}
+            sx={{ position: "absolute" }}
+            justifyContent="center"
+            alignContent={"center"}
+          >
+            {countDownVisisble && (
+              <Box
+                sx={(theme) => ({
+                  textAlign: "center",
+                  color: theme.palette.secondary.main,
+                  fontSize: "30rem",
+                  fontFamily: "bickley-script",
+                  animation: `${scale} linear 1s 10`,
+                  animationFillMode: "both",
+                })}
+              >
+                {countDown !== 0 && countDown}
+                {countDown === 0 && (
+                  <Box
+                    sx={(theme) => ({
+                      color: theme.palette.secondary.main,
+                      backgroundColor: "black",
+                    })}
+                  >
+                    Say Cheese
+                  </Box>
+                )}
+              </Box>
+            )}
+          </Stack>
         </Stack>
-      </Stack>
+      </Layout>
       <BackgroundDialog
         open={backgroundsDialogOpen}
         onClose={handleBackgroundDialogClose}

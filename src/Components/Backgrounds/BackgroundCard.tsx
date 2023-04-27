@@ -3,6 +3,7 @@ import { Card, CardContent, CardMedia, Typography } from "@mui/material";
 import OBSWebSocket from "obs-websocket-js";
 import { useObsSocket } from "../../hooks/useObsSocket";
 import { useMutation } from "react-query";
+import { ThemeContext } from "@mui/styled-engine";
 
 type BackgroundCardProps = {
   title: string;
@@ -44,16 +45,22 @@ const BackgroundCard: React.FC<BackgroundCardProps> = ({
   console.log(`http://localhost:4000/backdrops/${imageName}.jpg`);
 
   return (
-    <Card sx={{ width: "20rem" }}>
+    <Card
+      sx={(theme) => ({
+        width: "25rem",
+        backgroundColor: theme.palette.background.paper,
+      })}
+      elevation={6}
+    >
       <CardMedia
         image={`http://localhost:4000/backdrops/${imageName}.jpg`}
         title={title}
-        sx={{ width: 1, height: "10rem", cursor: "pointer" }}
+        sx={{ width: 1, height: "12rem", cursor: "pointer" }}
         onClick={() => changeBackgroundHandler(imageName)}
       />
       <CardContent>
         <Typography
-          variant="h4"
+          variant="h5"
           sx={{
             textAlign: "center",
           }}

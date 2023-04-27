@@ -1,5 +1,13 @@
-import { Button, Dialog, DialogTitle, Typography } from "@mui/material";
+import {
+  Button,
+  Dialog,
+  DialogTitle,
+  Typography,
+  Box,
+  Stack,
+} from "@mui/material";
 import React, { useState } from "react";
+import Layout from "../Layout/Layout";
 import Backgrounds from "./Backgrounds";
 
 type BackgroundDialogProps = {
@@ -18,30 +26,37 @@ const BackgroundDialog: React.FC<BackgroundDialogProps> = ({
       onClose={onClose}
       //TransitionComponent={Transition}
     >
-      <DialogTitle
-        sx={{
-          display: "flex",
-          justifyItems: "space-beteen",
-          border: "1px red solid",
-          width: 1,
-        }}
-      >
-        <Typography
-          variant="h2"
-          component="h3"
-          sx={{ flex: 1, textAlign: "center" }}
+      <Layout>
+        <DialogTitle
+          sx={{
+            display: "grid",
+            width: 1,
+            gridTemplateColumns: "1fr 700px 1fr",
+          }}
         >
-          Change Scene
-        </Typography>
-        <Button
-          variant="outlined"
-          onClick={onClose}
-          sx={{ alignSelf: "center", mr: "3rem" }}
-        >
-          Close
-        </Button>
-      </DialogTitle>
-      <Backgrounds onDialogClose={onClose} />
+          <Box></Box>
+          <Typography variant="h2" component="h3">
+            Change Scene
+          </Typography>
+          <Stack alignContent="center" justifyContent="center">
+            <Button
+              variant="contained"
+              color="secondary"
+              onClick={onClose}
+              sx={{ alignSelf: "center", pt: "1rem" }}
+            >
+              <Typography
+                variant="h5"
+                align="center"
+                sx={{ lineHeight: "80%" }}
+              >
+                Close
+              </Typography>
+            </Button>
+          </Stack>
+        </DialogTitle>
+        <Backgrounds onDialogClose={onClose} />
+      </Layout>
     </Dialog>
   );
 };

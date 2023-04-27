@@ -15,22 +15,42 @@ type BackgroundData = {
 const backgroundData: BackgroundData[] = [
   {
     image: background1,
-    title: "Background One",
+    title: "Star Wars",
     imageName: "background1",
   },
   {
     image: background2,
-    title: "Background Two",
+    title: "Harry Potter",
     imageName: "background2",
   },
   {
     image: background3,
-    title: "Background Three",
+    title: "Mars",
     imageName: "background3",
   },
   {
     image: background4,
-    title: "Background Four",
+    title: "LOTR",
+    imageName: "background4",
+  },
+  {
+    image: background1,
+    title: "Star Wars",
+    imageName: "background1",
+  },
+  {
+    image: background2,
+    title: "Harry Potter",
+    imageName: "background2",
+  },
+  {
+    image: background3,
+    title: "Mars",
+    imageName: "background3",
+  },
+  {
+    image: background4,
+    title: "LOTR",
     imageName: "background4",
   },
 ];
@@ -41,7 +61,13 @@ type BackgroundsProps = {
 
 const Backgrounds: React.FC<BackgroundsProps> = ({ onDialogClose }) => {
   return (
-    <Stack p="1rem" mt="1rem" direction="row" gap="2rem" flexWrap={"wrap"}>
+    <Stack
+      p="1rem"
+      direction="row"
+      justifyContent="center"
+      flexWrap="wrap"
+      gap="1rem"
+    >
       {backgroundData.map((background) => (
         <BackgroundCard
           key={background.title}
