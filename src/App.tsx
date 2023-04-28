@@ -1,22 +1,27 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import "./App.css";
 import Webcam from "react-webcam";
-import { Button, Stack, Box } from "@mui/material";
+import { Button, Stack, Box, Typography } from "@mui/material";
 import PaletteIcon from "@mui/icons-material/Palette";
 import CameraAltIcon from "@mui/icons-material/CameraAlt";
 import BackgroundDialog from "./Components/Backgrounds/BackgroundDialog";
 import OutputDialog from "./Components/Output/OutputDialog";
 import { useMutation } from "react-query";
 import Layout from "./Components/Layout/Layout";
-import { styled } from "@mui/material/styles";
 import { keyframes } from "@mui/system";
+import AnimationRotateContainer from "./Components/Animations/AnimationRotateContainer";
+import FloatingButton from "./Components/Button/FloatingButton";
+import AnimationCountDown from "./Components/Animations/AnimationCountDown";
 
-const scale = keyframes`
-  from {
-    transform: scale(3);
-  }
-  to {
-    transform: scale(0.5);
+const flash = keyframes`
+  0% {
+    opacity: 0;
+  },
+  50% {
+    opacity: 1;
+  },
+  100% {
+    opacity: 0;
   }
 `;
 
@@ -34,9 +39,15 @@ export const floatingButtonSX = {
   borderRadius: "50%",
 };
 
+const floatingButtonPosition = {
+  position: "absolute",
+  zIndex: 2,
+};
+
 function App() {
   const [outputImage, setOutputImage] = React.useState<string | null>(null);
   const [countDownVisisble, setCountDownVisible] = React.useState(false);
+  const [enableFlash, setEnableFlash] = useState(false);
 
   //react query
   const captureImage = useMutation(
@@ -50,6 +61,7 @@ function App() {
         console.log("Success: ", data);
         setOutputDialogOpen(true);
         setOutputImage(data);
+        setEnableFlash(false);
       },
       onError: (error) => {
         console.log("Error: ", error);
@@ -76,28 +88,25 @@ function App() {
   //console.log(navigator.mediaDevices.enumerateDevices());
 
   const takeImage = () => {
+    setEnableFlash(true);
     captureImage.mutate();
   };
 
-  useEffect(() => {
-    if (isRunning) {
-      setTimeout(() => {
-        if (countDown === 0) {
-          setIsRunning(false);
-          setCountDown(10);
-          setCountDownVisible(false);
-          takeImage();
-        } else {
-          setCountDown((prevCount) => prevCount - 1);
-        }
-      }, 1000);
-    }
-  }, [isRunning, countDown, takeImage, outputDialogOpen]);
+  const reduceCount = () => {
+    console.log(countDown);
+    setCountDown(countDown - 1);
+  };
 
   const handleScreenshot = () => {
-    setIsRunning(true);
+    // setIsRunning(true);
     setCountDownVisible(true);
   };
+
+  if (countDown === -1) {
+    setCountDown(10);
+    setCountDownVisible(false);
+    takeImage();
+  }
 
   return (
     <>
@@ -118,73 +127,76 @@ function App() {
               outline: "15px #6b7a40 solid",
             }}
           />
-          <Button
-            variant="contained"
-            color="secondary"
-            onClick={(evt) => {
-              evt.preventDefault();
-              setBackgroundsDialogOpen(true);
-            }}
-            sx={{
-              ...floatingButtonSX,
-              bottom: "1rem",
-              left: "1rem",
-            }}
+
+          <AnimationRotateContainer
+            sx={{ ...floatingButtonPosition, bottom: "2rem", right: "2rem" }}
           >
-            <PaletteIcon
-              fontSize="large"
-              sx={{ height: "5rem", width: "5rem" }}
-            />
-          </Button>
-          <Button
-            variant="contained"
-            onClick={() => {
-              handleScreenshot();
-            }}
-            color="secondary"
-            sx={{
-              ...floatingButtonSX,
-              bottom: "1rem",
-              right: "1rem",
-            }}
+            <FloatingButton
+              onClick={(evt) => {
+                evt.preventDefault();
+                handleScreenshot();
+              }}
+            >
+              <CameraAltIcon
+                fontSize="large"
+                sx={{ height: "5rem", width: "5rem" }}
+              />
+            </FloatingButton>
+          </AnimationRotateContainer>
+          <AnimationRotateContainer
+            sx={{ ...floatingButtonPosition, bottom: "2rem", left: "2rem" }}
           >
-            <CameraAltIcon
-              fontSize="large"
-              sx={{ height: "5rem", width: "5rem" }}
-            />
-          </Button>
-          <Stack
-            width={1}
-            height={1}
-            sx={{ position: "absolute" }}
-            justifyContent="center"
-            alignContent={"center"}
-          >
-            {countDownVisisble && (
-              <Box
+            <FloatingButton
+              onClick={(evt) => {
+                evt.preventDefault();
+                setBackgroundsDialogOpen(true);
+              }}
+            >
+              <PaletteIcon
+                fontSize="large"
+                sx={{ height: "5rem", width: "5rem" }}
+              />
+            </FloatingButton>
+          </AnimationRotateContainer>
+
+          {countDownVisisble && (
+            <Stack
+              width={1}
+              height={1}
+              sx={{ position: "absolute" }}
+              justifyContent="center"
+              alignItems={"center"}
+              direction="row"
+            >
+              <AnimationCountDown
                 sx={(theme) => ({
                   textAlign: "center",
                   color: theme.palette.secondary.main,
-                  fontSize: "30rem",
+                  fontSize: "100rem",
+                  lineHeight: "100rem",
                   fontFamily: "bickley-script",
-                  animation: `${scale} linear 1s 10`,
-                  animationFillMode: "both",
                 })}
+                timing={1000}
+                setCount={reduceCount}
               >
                 {countDown !== 0 && countDown}
-                {countDown === 0 && (
-                  <Box
-                    sx={(theme) => ({
-                      color: theme.palette.secondary.main,
-                      backgroundColor: "black",
-                    })}
-                  >
-                    Say Cheese
-                  </Box>
-                )}
-              </Box>
-            )}
-          </Stack>
+              </AnimationCountDown>
+              {countDown === 0 && (
+                <Box
+                  sx={(theme) => ({
+                    textAlign: "center",
+                    color: theme.palette.secondary.main,
+                    fontSize: "19rem",
+                    fontFamily: "bickley-script",
+                    height: "min-content",
+                    background: theme.palette.background.paper,
+                  })}
+                >
+                  Say Cheese
+                </Box>
+              )}
+            </Stack>
+          )}
         </Stack>
       </Layout>
       <BackgroundDialog
@@ -196,8 +208,37 @@ function App() {
         onClose={handleOutputDialogClose}
         imageName={outputImage}
       />
+      {enableFlash && (
+        <Box
+          sx={{
+            position: "absolute",
+            width: 1,
+            height: 1,
+            backgroundColor: "white",
+            top: 0,
+            left: 0,
+            animation: `${flash} ease-out 0.4s 1`,
+            animationFillMode: "both",
+          }}
+        ></Box>
+      )}
     </>
   );
 }
 
 export default App;
+
+// useEffect(() => {
+//   if (isRunning) {
+//     setTimeout(() => {
+//       if (countDown === 0) {
+//         setIsRunning(false);
+//         setCountDown(10);
+//         setCountDownVisible(false);
+//         takeImage();
+//       } else {
+//         setCountDown((prevCount) => prevCount - 1);
+//       }
+//     }, 1000);
+//   }
+// }, [isRunning, countDown, takeImage, outputDialogOpen]);
