@@ -27,10 +27,10 @@ const theme = createTheme({
   },
   typography: {
     fontFamily: "classic-roman",
-    // h3: {
-    //   fontSize: "4rem",
-    //   lineHeight: "3rem",
-    // },
+    h3: {
+      fontSize: "4rem",
+      lineHeight: "3rem",
+    },
   },
 });
 

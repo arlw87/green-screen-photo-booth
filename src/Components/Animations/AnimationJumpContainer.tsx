@@ -30,9 +30,8 @@ const AnimationJumpContainer: React.FC<AnimationType> = ({
     };
   }, [isBooped]);
 
-  const style = useSpring({
+  const style1 = useSpring({
     display: "inline-block",
-    backfaceVisibility: "hidden",
     transform: isBooped
       ? `translate( 0px, -${heightPx}px )`
       : `translate(0px, 0px)`,
@@ -44,7 +43,7 @@ const AnimationJumpContainer: React.FC<AnimationType> = ({
 
   return (
     <Box {...props}>
-      <animated.div onMouseEnter={() => setIsBooped(true)} style={style}>
+      <animated.div onMouseEnter={() => setIsBooped(true)} style={style1}>
         {children}
       </animated.div>
     </Box>

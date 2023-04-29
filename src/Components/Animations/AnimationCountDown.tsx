@@ -21,7 +21,7 @@ const AnimationCountDown: React.FC<AnimationCountDownType> = ({
   const style = useSpring({
     from: { transform: `scale(${scaleStart})` },
     to: { transform: `scale(${scaleEnd})` },
-    loop: true,
+    reset: true,
     config: {
       duration: timing,
     },

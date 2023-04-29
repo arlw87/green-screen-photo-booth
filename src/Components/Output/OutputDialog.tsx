@@ -5,6 +5,8 @@ import {
   Typography,
   Box,
   Stack,
+  DialogContent,
+  DialogActions,
 } from "@mui/material";
 import { floatingButtonSX } from "../../App";
 import React, { useState } from "react";
@@ -15,6 +17,11 @@ import CloseIcon from "@mui/icons-material/Close";
 import AnimationRotateContainer from "../Animations/AnimationRotateContainer";
 import FloatingButton from "../Button/FloatingButton";
 import AnimationJumpContainer from "../Animations/AnimationJumpContainer";
+import { useMutation } from "react-query";
+
+const getFileName = (str: string | null) => {
+  return str ? str?.split('\\')?.pop()?.split('/').pop() : '';
+}
 
 type OutputDialogProps = {
   open: boolean;
@@ -27,12 +34,48 @@ const OutputDialog: React.FC<OutputDialogProps> = ({
   onClose,
   imageName = "No Image",
 }) => {
+
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+
+  const deleteImageRequest = useMutation(
+    async(data) => {
+      const repsonse = await fetch("http://localhost:4000/delete", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ filename: getFileName(imageName)}),
+      });
+      return repsonse;
+    },
+    {
+      onSuccess: (data) => {
+        console.log(data);
+        console.log('success');
+        setDeleteDialogOpen(false);
+        onClose();
+      },
+      onError: (error) => {
+        console.log(error);
+      },
+    }
+  )
+
+  const deleteImage = () => {
+    console.log('delete image', imageName);
+    deleteImageRequest.mutate();
+    
+  }
 
   const floatingButtonPosition = {
     position: "absolute",
     zIndex: 2,
   };
+
+  const sendToTV = () => {
+    // send a post request with the image name
+  }
 
   return (
     <>
@@ -87,7 +130,7 @@ const OutputDialog: React.FC<OutputDialogProps> = ({
                     evt.preventDefault();
                   }}
                 >
-                  <DeleteIcon sx={{ height: "5rem", width: "5rem" }} />
+                  <DeleteIcon onClick={() => setDeleteDialogOpen(true)} sx={{ height: "5rem", width: "5rem" }} />
                 </FloatingButton>
               </AnimationJumpContainer>
 
@@ -139,6 +182,27 @@ const OutputDialog: React.FC<OutputDialogProps> = ({
             <Button>Send To TV</Button>
           </Stack>
         </Layout>
+      </Dialog>
+
+      <Dialog
+        open={deleteDialogOpen}
+        onClose={() => setDeleteDialogOpen(false)}
+        maxWidth="sm"
+        fullWidth
+        sx={{padding:"2rem"}}
+      >
+        <DialogTitle id="alert-dialog-title" sx={{padding:"2rem"}}>
+          <Typography variant='h3'>Delete Image</Typography>
+        </DialogTitle>
+        <DialogContent sx={{padding: '2rem'}}>
+            <Typography variant='body1'>Are you sure you want to delete this image?</Typography>
+        </DialogContent>
+        <DialogActions sx={{padding: '2rem', mx: 'auto'}}>
+          <Button onClick={() => setDeleteDialogOpen(false)} variant='contained' color='secondary'><Typography variant='subtitle1' sx={{pt: 2}}>Cancel</Typography></Button>
+          <Button onClick={deleteImage} variant='contained'>
+            <Typography variant='subtitle1' sx={{pt: 2}}>Delete</Typography>
+          </Button>
+        </DialogActions>
       </Dialog>
     </>
   );

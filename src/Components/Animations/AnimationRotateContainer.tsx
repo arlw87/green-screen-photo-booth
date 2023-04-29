@@ -32,7 +32,7 @@ const AnimationRotateContainer: React.FC<AnimationType> = ({
 
   const style = useSpring({
     display: "inline-block",
-    backfaceVisibility: "hidden",
+
     transform: isBooped ? `rotate(${rotation}deg)` : `rotate(0deg)`,
     config: {
       tension: 400,

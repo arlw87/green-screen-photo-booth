@@ -48,6 +48,7 @@ function App() {
   const [outputImage, setOutputImage] = React.useState<string | null>(null);
   const [countDownVisisble, setCountDownVisible] = React.useState(false);
   const [enableFlash, setEnableFlash] = useState(false);
+  const [countDown, setCountDown] = React.useState(10);
 
   //react query
   const captureImage = useMutation(
@@ -58,10 +59,10 @@ function App() {
     },
     {
       onSuccess: (data) => {
-        console.log("Success: ", data);
         setOutputDialogOpen(true);
         setOutputImage(data);
         setEnableFlash(false);
+        setCountDown(10);
       },
       onError: (error) => {
         console.log("Error: ", error);
@@ -73,9 +74,6 @@ function App() {
     React.useState(false);
 
   const [outputDialogOpen, setOutputDialogOpen] = React.useState(false);
-
-  const [countDown, setCountDown] = React.useState(10);
-  const [isRunning, setIsRunning] = React.useState(false);
 
   const handleBackgroundDialogClose = () => {
     setBackgroundsDialogOpen(false);
@@ -94,19 +92,19 @@ function App() {
 
   const reduceCount = () => {
     console.log(countDown);
-    setCountDown(countDown - 1);
+    setCountDown((prev) => prev - 1);
   };
 
   const handleScreenshot = () => {
-    // setIsRunning(true);
     setCountDownVisible(true);
   };
 
-  if (countDown === -1) {
-    setCountDown(10);
-    setCountDownVisible(false);
-    takeImage();
-  }
+  useEffect(() => {
+    if (countDown === 0) {
+      setCountDownVisible(false);
+      takeImage();
+    }
+  }, [countDown]);
 
   return (
     <>
@@ -181,20 +179,6 @@ function App() {
               >
                 {countDown !== 0 && countDown}
               </AnimationCountDown>
-              {countDown === 0 && (
-                <Box
-                  sx={(theme) => ({
-                    textAlign: "center",
-                    color: theme.palette.secondary.main,
-                    fontSize: "19rem",
-                    fontFamily: "bickley-script",
-                    height: "min-content",
-                    background: theme.palette.background.paper,
-                  })}
-                >
-                  Say Cheese
-                </Box>
-              )}
             </Stack>
           )}
         </Stack>
@@ -228,17 +212,4 @@ function App() {
 
 export default App;
 
-// useEffect(() => {
-//   if (isRunning) {
-//     setTimeout(() => {
-//       if (countDown === 0) {
-//         setIsRunning(false);
-//         setCountDown(10);
-//         setCountDownVisible(false);
-//         takeImage();
-//       } else {
-//         setCountDown((prevCount) => prevCount - 1);
-//       }
-//     }, 1000);
-//   }
-// }, [isRunning, countDown, takeImage, outputDialogOpen]);
+
