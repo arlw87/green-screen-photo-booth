@@ -47,7 +47,7 @@ const BackgroundCard: React.FC<BackgroundCardProps> = ({
   return (
     <Card
       sx={(theme) => ({
-        width: "25rem",
+        width: "30rem",
         backgroundColor: theme.palette.background.paper,
       })}
       elevation={6}
@@ -55,14 +55,15 @@ const BackgroundCard: React.FC<BackgroundCardProps> = ({
       <CardMedia
         image={`http://localhost:4000/backdrops/${imageName}.jpg`}
         title={title}
-        sx={{ width: 1, height: "12rem", cursor: "pointer" }}
+        sx={{ width: 1, height: "20rem", cursor: "pointer" }}
         onClick={() => changeBackgroundHandler(imageName)}
       />
       <CardContent>
         <Typography
-          variant="h5"
+          variant="subtitle1"
           sx={{
             textAlign: "center",
+            pt: "1rem",
           }}
         >
           {title}

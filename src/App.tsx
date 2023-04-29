@@ -104,6 +104,10 @@ function App() {
       setCountDownVisible(false);
       takeImage();
     }
+
+    if (countDown < 0) {
+      setCountDown(10);
+    }
   }, [countDown]);
 
   return (
@@ -174,7 +178,7 @@ function App() {
                   lineHeight: "100rem",
                   fontFamily: "bickley-script",
                 })}
-                timing={1000}
+                timing={100}
                 setCount={reduceCount}
               >
                 {countDown !== 0 && countDown}
@@ -201,7 +205,7 @@ function App() {
             backgroundColor: "white",
             top: 0,
             left: 0,
-            animation: `${flash} ease-out 0.4s 1`,
+            animation: `${flash} ease-out 1s 1`,
             animationFillMode: "both",
           }}
         ></Box>
@@ -211,5 +215,3 @@ function App() {
 }
 
 export default App;
-
-

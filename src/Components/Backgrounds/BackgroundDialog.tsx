@@ -9,6 +9,7 @@ import {
 import React, { useState } from "react";
 import Layout from "../Layout/Layout";
 import Backgrounds from "./Backgrounds";
+import CloseIcon from "@mui/icons-material/Close";
 
 type BackgroundDialogProps = {
   open: boolean;
@@ -43,15 +44,14 @@ const BackgroundDialog: React.FC<BackgroundDialogProps> = ({
               variant="contained"
               color="secondary"
               onClick={onClose}
-              sx={{ alignSelf: "center", pt: "1rem" }}
+              sx={{
+                alignSelf: "center",
+                borderRadius: "50%",
+                height: "8rem",
+                width: "8rem",
+              }}
             >
-              <Typography
-                variant="h5"
-                align="center"
-                sx={{ lineHeight: "80%" }}
-              >
-                Close
-              </Typography>
+              <CloseIcon sx={{ height: "5rem", width: "5rem" }} />
             </Button>
           </Stack>
         </DialogTitle>

@@ -154,7 +154,7 @@ theme.typography.subtitle1 = {
   fontSize: "2rem",
   lineHeight: "2rem",
   fontFamily: "classic-roman",
-  fontWeight: "600",
+  fontWeight: "300",
 
   [theme.breakpoints.up("sm")]: {
     fontSize: "2.5rem",

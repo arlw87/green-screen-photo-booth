@@ -1,27 +1,26 @@
 import {
-  Button,
   Dialog,
-  DialogTitle,
   Typography,
   Box,
   Stack,
-  DialogContent,
-  DialogActions,
+  Snackbar,
+  Alert,
+  AlertColor,
 } from "@mui/material";
-import { floatingButtonSX } from "../../App";
 import React, { useState } from "react";
 import Layout from "../Layout/Layout";
-import ShareIcon from "@mui/icons-material/Share";
-import DeleteIcon from "@mui/icons-material/Delete";
-import CloseIcon from "@mui/icons-material/Close";
-import AnimationRotateContainer from "../Animations/AnimationRotateContainer";
-import FloatingButton from "../Button/FloatingButton";
-import AnimationJumpContainer from "../Animations/AnimationJumpContainer";
+
 import { useMutation } from "react-query";
 
-const getFileName = (str: string | null) => {
-  return str ? str?.split('\\')?.pop()?.split('/').pop() : '';
-}
+import CastIcon from "@mui/icons-material/Cast";
+import DeleteIcon from "@mui/icons-material/Delete";
+import CloseIcon from "@mui/icons-material/Close";
+import EmailIcon from "@mui/icons-material/Email";
+
+import { getFileName } from "../helpers/helpers";
+import DecisionDialog from "../Dialog/DecisionDialog";
+import JumpingFloatingButton from "../Button/JumpingFloatingButton";
+import EmailDialog from "../Dialog/EmailDialog";
 
 type OutputDialogProps = {
   open: boolean;
@@ -34,48 +33,125 @@ const OutputDialog: React.FC<OutputDialogProps> = ({
   onClose,
   imageName = "No Image",
 }) => {
-
-  const [shareDialogOpen, setShareDialogOpen] = useState(false);
+  const [emailDialogOpen, setEmailDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [sendToTVDialogOpen, setSendToTVDialogOpen] = useState(false);
 
   const deleteImageRequest = useMutation(
-    async(data) => {
+    async (data) => {
       const repsonse = await fetch("http://localhost:4000/delete", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ filename: getFileName(imageName)}),
+        body: JSON.stringify({ filename: getFileName(imageName) }),
       });
       return repsonse;
     },
     {
       onSuccess: (data) => {
-        console.log(data);
-        console.log('success');
+        setSnackbarMessage("Image Deleted");
+        setSnackbarSeverity("success");
+        setSnackbarOpen(true);
         setDeleteDialogOpen(false);
         onClose();
       },
       onError: (error) => {
+        setSnackbarMessage("Image Failed to Delete");
+        setSnackbarSeverity("error");
+        setSnackbarOpen(true);
         console.log(error);
       },
     }
-  )
+  );
+
+  const sendToTVRequest = useMutation(
+    async (data) => {
+      const response = await fetch("http://localhost:4000/cast", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ filename: getFileName(imageName) }),
+      });
+      return response;
+    },
+    {
+      onSuccess: (data) => {
+        setSnackbarMessage("Image sent to TV");
+        setSnackbarSeverity("success");
+        setSnackbarOpen(true);
+        setSendToTVDialogOpen(false);
+      },
+      onError: (error) => {
+        console.log(error);
+        setSnackbarMessage("Image failed to be sent to TV");
+        setSnackbarSeverity("error");
+        setSnackbarOpen(true);
+      },
+    }
+  );
+
+  type postEmail = {
+    emailAddress: string;
+    fileName: string;
+  };
+
+  const sendEmailRequest = useMutation(
+    async (data: postEmail) => {
+      const response = await fetch("http://localhost:4000/sendemail", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          fileName: data.fileName,
+          emailAddress: data.emailAddress,
+        }),
+      });
+      console.log("response", response);
+      if (response.status !== 200) {
+        throw new Error("Email Failed");
+      }
+      return response;
+    },
+    {
+      onSuccess: (data) => {
+        setSnackbarMessage("Email Sent");
+        setSnackbarSeverity("success");
+        setSnackbarOpen(true);
+        setEmailDialogOpen(false);
+      },
+      onError: (error) => {
+        console.log(error);
+        setSnackbarMessage("Email Failed");
+        setSnackbarSeverity("error");
+        setSnackbarOpen(true);
+      },
+    }
+  );
 
   const deleteImage = () => {
-    console.log('delete image', imageName);
     deleteImageRequest.mutate();
-    
-  }
-
-  const floatingButtonPosition = {
-    position: "absolute",
-    zIndex: 2,
   };
 
   const sendToTV = () => {
-    // send a post request with the image name
-  }
+    console.log("Sending to TV");
+    sendToTVRequest.mutate();
+  };
+
+  const sendEmail = (emailAddress: string) => {
+    console.log("Sending Email");
+    sendEmailRequest.mutate({
+      emailAddress,
+      fileName: getFileName(imageName) ?? "",
+    });
+  };
+
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [snackbarSeverity, setSnackbarSeverity] =
+    useState<AlertColor>("success");
 
   return (
     <>
@@ -118,92 +194,108 @@ const OutputDialog: React.FC<OutputDialogProps> = ({
                 </Typography>
               )}
 
-              <AnimationJumpContainer
-                sx={{
-                  ...floatingButtonPosition,
-                  bottom: "8rem",
-                  left: "8rem",
-                }}
+              <JumpingFloatingButton
+                onClick={() => setDeleteDialogOpen(true)}
+                positionBottom="8rem"
+                positionLeft="10%"
               >
-                <FloatingButton
-                  onClick={(evt) => {
-                    evt.preventDefault();
-                  }}
-                >
-                  <DeleteIcon onClick={() => setDeleteDialogOpen(true)} sx={{ height: "5rem", width: "5rem" }} />
-                </FloatingButton>
-              </AnimationJumpContainer>
+                <DeleteIcon sx={{ height: "5rem", width: "5rem" }} />
+              </JumpingFloatingButton>
 
-              <AnimationJumpContainer
-                sx={{
-                  ...floatingButtonPosition,
-                  bottom: "8rem",
-                  left: "55rem",
-                }}
+              <JumpingFloatingButton
+                onClick={() => setEmailDialogOpen(true)}
+                positionBottom="8rem"
+                positionLeft="45%"
+                tooltip="Email Image"
               >
-                <FloatingButton onClick={() => setShareDialogOpen(true)}>
-                  <ShareIcon sx={{ height: "5rem", width: "5rem" }} />
-                </FloatingButton>
-              </AnimationJumpContainer>
+                <EmailIcon sx={{ height: "5rem", width: "5rem" }} />
+              </JumpingFloatingButton>
 
-              <AnimationJumpContainer
-                sx={{
-                  ...floatingButtonPosition,
-                  bottom: "8rem",
-                  right: "8rem",
-                }}
+              <JumpingFloatingButton
+                onClick={() => setSendToTVDialogOpen(true)}
+                positionBottom="8rem"
+                positionLeft="55%"
+                tooltip="Send to TV"
               >
-                <FloatingButton onClick={onClose}>
-                  <CloseIcon sx={{ height: "5rem", width: "5rem" }} />
-                </FloatingButton>
-              </AnimationJumpContainer>
+                <CastIcon sx={{ height: "5rem", width: "5rem" }} />
+              </JumpingFloatingButton>
+
+              <JumpingFloatingButton
+                onClick={onClose}
+                positionBottom="8rem"
+                positionLeft="90%"
+              >
+                <CloseIcon sx={{ height: "5rem", width: "5rem" }} />
+              </JumpingFloatingButton>
             </Box>
           </Stack>
         </Layout>
       </Dialog>
 
-      <Dialog open={shareDialogOpen} maxWidth="md">
-        <Layout>
-          <DialogTitle
-            sx={{ display: "flex", justifyContent: "space-between" }}
-          >
-            <Typography variant="h4">Share</Typography>{" "}
-            <Button
-              onClick={() => setShareDialogOpen(false)}
-              sx={{ alignSelf: "center", mr: "3rem" }}
-              variant="contained"
-              color="secondary"
-            >
-              Close
-            </Button>
-          </DialogTitle>
-          <Stack>
-            <Button color="secondary">Email</Button>
-            <Button>Send To TV</Button>
-          </Stack>
-        </Layout>
-      </Dialog>
-
-      <Dialog
+      <DecisionDialog
         open={deleteDialogOpen}
         onClose={() => setDeleteDialogOpen(false)}
-        maxWidth="sm"
-        fullWidth
-        sx={{padding:"2rem"}}
+        title="Delete Image"
+        message="Are you sure you want to delete this image?"
+        primeActionButtonText="Delete"
+        handlePrimeAction={deleteImage}
+        isLoading={deleteImageRequest.isLoading}
+      />
+
+      <DecisionDialog
+        open={sendToTVDialogOpen}
+        onClose={() => setSendToTVDialogOpen(false)}
+        title="Display on TV"
+        message="Click send to be displayed on the TV"
+        primeActionButtonText="Send"
+        handlePrimeAction={sendToTV}
+        size="md"
+      />
+
+      {/* <DecisionDialog
+        open={emailDialogOpen}
+        onClose={() => setEmailDialogOpen(false)}
+        title="Send Email"
+        message="Click Here to send email"
+        primeActionButtonText="Send"
+        handlePrimeAction={sendEmail}
+        size="md"
+        isLoading={sendEmailRequest.isLoading}
+      /> */}
+
+      <EmailDialog
+        size="sm"
+        open={emailDialogOpen}
+        onClose={() => setEmailDialogOpen(false)}
+        onSubmit={sendEmail}
+        isLoading={sendEmailRequest.isLoading}
+      />
+
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={4000}
+        onClose={() => setSnackbarOpen(false)}
+        message="Note archived"
+        anchorOrigin={{
+          vertical: "bottom",
+          horizontal: "center",
+        }}
       >
-        <DialogTitle id="alert-dialog-title" sx={{padding:"2rem"}}>
-          <Typography variant='h3'>Delete Image</Typography>
-        </DialogTitle>
-        <DialogContent sx={{padding: '2rem'}}>
-            <Typography variant='body1'>Are you sure you want to delete this image?</Typography>
-        </DialogContent>
-        <DialogActions sx={{padding: '2rem', mx: 'auto'}}>
-          <Button onClick={() => setDeleteDialogOpen(false)} variant='contained' color='secondary'><Typography variant='subtitle1' sx={{pt: 2}}>Cancel</Typography></Button>
-          <Button onClick={deleteImage} variant='contained'>
-            <Typography variant='subtitle1' sx={{pt: 2}}>Delete</Typography>
-          </Button>
-        </DialogActions>
-      </Dialog>
+        <Alert
+          sx={{
+            fontSize: "2rem",
+            lineHeight: "3rem",
+            height: "4rem",
+            justifyContent: "center",
+            display: "flex",
+            alignItems: "center",
+          }}
+          variant="filled"
+          severity={snackbarSeverity}
+        >
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </>
   );
 };

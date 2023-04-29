@@ -26,7 +26,6 @@ const AnimationCountDown: React.FC<AnimationCountDownType> = ({
       duration: timing,
     },
     onRest: () => {
-      console.log("fire");
       setCount();
     },
   });
