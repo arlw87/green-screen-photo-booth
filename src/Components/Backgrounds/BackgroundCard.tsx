@@ -7,14 +7,12 @@ import { ThemeContext } from "@mui/styled-engine";
 
 type BackgroundCardProps = {
   title: string;
-  image: string;
   onDialogClose: () => void;
   imageName: string;
 };
 
 const BackgroundCard: React.FC<BackgroundCardProps> = ({
   title,
-  image,
   onDialogClose,
   imageName,
 }) => {

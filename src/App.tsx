@@ -178,7 +178,7 @@ function App() {
                   lineHeight: "100rem",
                   fontFamily: "bickley-script",
                 })}
-                timing={100}
+                timing={1000}
                 setCount={reduceCount}
               >
                 {countDown !== 0 && countDown}

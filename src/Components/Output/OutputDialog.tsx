@@ -142,6 +142,7 @@ const OutputDialog: React.FC<OutputDialogProps> = ({
 
   const sendEmail = (emailAddress: string) => {
     console.log("Sending Email");
+    console.log("emailAddress", emailAddress);
     sendEmailRequest.mutate({
       emailAddress,
       fileName: getFileName(imageName) ?? "",
