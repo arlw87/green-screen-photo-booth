@@ -157,7 +157,7 @@ const OutputDialog: React.FC<OutputDialogProps> = ({
   return (
     <>
       <Dialog fullScreen open={open} onClose={onClose}>
-        <Layout>
+        <Layout sx={{ minHeight: "100%" }}>
           <Stack
             direction="row"
             justifyContent="center"
@@ -178,7 +178,7 @@ const OutputDialog: React.FC<OutputDialogProps> = ({
                 >
                   <img
                     src={imageName}
-                    alt="captured image"
+                    alt="captured"
                     style={{
                       width: "100%",
                       height: "auto",
@@ -198,7 +198,7 @@ const OutputDialog: React.FC<OutputDialogProps> = ({
               <JumpingFloatingButton
                 onClick={() => setDeleteDialogOpen(true)}
                 positionBottom="8rem"
-                positionLeft="10%"
+                positionLeft="7%"
               >
                 <DeleteIcon sx={{ height: "5rem", width: "5rem" }} />
               </JumpingFloatingButton>
@@ -206,7 +206,7 @@ const OutputDialog: React.FC<OutputDialogProps> = ({
               <JumpingFloatingButton
                 onClick={() => setEmailDialogOpen(true)}
                 positionBottom="8rem"
-                positionLeft="45%"
+                positionLeft="42%"
                 tooltip="Email Image"
               >
                 <EmailIcon sx={{ height: "5rem", width: "5rem" }} />
@@ -215,7 +215,7 @@ const OutputDialog: React.FC<OutputDialogProps> = ({
               <JumpingFloatingButton
                 onClick={() => setSendToTVDialogOpen(true)}
                 positionBottom="8rem"
-                positionLeft="55%"
+                positionLeft="52%"
                 tooltip="Send to TV"
               >
                 <CastIcon sx={{ height: "5rem", width: "5rem" }} />
@@ -224,7 +224,7 @@ const OutputDialog: React.FC<OutputDialogProps> = ({
               <JumpingFloatingButton
                 onClick={onClose}
                 positionBottom="8rem"
-                positionLeft="90%"
+                positionLeft="88%"
               >
                 <CloseIcon sx={{ height: "5rem", width: "5rem" }} />
               </JumpingFloatingButton>

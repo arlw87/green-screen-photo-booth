@@ -6,7 +6,7 @@ import {
   Box,
   Stack,
 } from "@mui/material";
-import React, { useState } from "react";
+import React from "react";
 import Layout from "../Layout/Layout";
 import Backgrounds from "./Backgrounds";
 import CloseIcon from "@mui/icons-material/Close";
@@ -25,6 +25,7 @@ const BackgroundDialog: React.FC<BackgroundDialogProps> = ({
       fullScreen
       open={open}
       onClose={onClose}
+      sx={{ height: "none" }}
       //TransitionComponent={Transition}
     >
       <Layout>

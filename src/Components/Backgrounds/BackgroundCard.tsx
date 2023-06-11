@@ -1,26 +1,25 @@
 import React from "react";
 import { Card, CardContent, CardMedia, Typography } from "@mui/material";
-import OBSWebSocket from "obs-websocket-js";
-import { useObsSocket } from "../../hooks/useObsSocket";
 import { useMutation } from "react-query";
-import { ThemeContext } from "@mui/styled-engine";
 
 type BackgroundCardProps = {
   title: string;
   onDialogClose: () => void;
   imageName: string;
+  sceneItemId: number;
 };
 
 const BackgroundCard: React.FC<BackgroundCardProps> = ({
   title,
   onDialogClose,
   imageName,
+  sceneItemId,
 }) => {
   //const obs = useObsSocket();
   const changeBackground = useMutation(
-    async (backgroundName: string) => {
+    async () => {
       const response = await fetch(
-        `http://localhost:4000/changebackground/${backgroundName}`
+        `http://localhost:4000/changebackground/${sceneItemId}`
       );
       const jsonData = await response.json();
       return jsonData;
@@ -36,12 +35,6 @@ const BackgroundCard: React.FC<BackgroundCardProps> = ({
     }
   );
 
-  const changeBackgroundHandler = (backgroundImage: string) => {
-    changeBackground.mutate(backgroundImage);
-  };
-
-  console.log(`http://localhost:4000/backdrops/${imageName}.jpg`);
-
   return (
     <Card
       sx={(theme) => ({
@@ -54,7 +47,7 @@ const BackgroundCard: React.FC<BackgroundCardProps> = ({
         image={`http://localhost:4000/backdrops/${imageName}.jpg`}
         title={title}
         sx={{ width: 1, height: "20rem", cursor: "pointer" }}
-        onClick={() => changeBackgroundHandler(imageName)}
+        onClick={() => changeBackground.mutate()}
       />
       <CardContent>
         <Typography
