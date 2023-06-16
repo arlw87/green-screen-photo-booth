@@ -28,7 +28,7 @@ const flash = keyframes`
 const videoConstraints = {
   width: 1920,
   height: 1080,
-  deviceId: "007a17015a7042f7c22069ed778977108e600c670d05a0d675fbd68495adf767",
+  deviceId: "919fe01697988eaeda90ce62025c09c35d26a0ce7b50a21f91fb95d6556b09b3",
 };
 
 export const floatingButtonSX = {
@@ -83,7 +83,7 @@ function App() {
     setOutputDialogOpen(false);
   };
 
-  //console.log(navigator.mediaDevices.enumerateDevices());
+  console.log(navigator.mediaDevices.enumerateDevices());
 
   const takeImage = () => {
     setEnableFlash(true);
