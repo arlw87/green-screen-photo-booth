@@ -16,6 +16,7 @@ import CastIcon from "@mui/icons-material/Cast";
 import DeleteIcon from "@mui/icons-material/Delete";
 import CloseIcon from "@mui/icons-material/Close";
 import EmailIcon from "@mui/icons-material/Email";
+import PrintIcon from "@mui/icons-material/Print";
 
 import { getFileName } from "../helpers/helpers";
 import DecisionDialog from "../Dialog/DecisionDialog";
@@ -36,6 +37,7 @@ const OutputDialog: React.FC<OutputDialogProps> = ({
   const [emailDialogOpen, setEmailDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [sendToTVDialogOpen, setSendToTVDialogOpen] = useState(false);
+  const [sendToPrinterDialogOpen, setSendToPrinterDialog] = useState(false);
 
   const deleteImageRequest = useMutation(
     async (data) => {
@@ -58,6 +60,32 @@ const OutputDialog: React.FC<OutputDialogProps> = ({
       },
       onError: (error) => {
         setSnackbarMessage("Image Failed to Delete");
+        setSnackbarSeverity("error");
+        setSnackbarOpen(true);
+        console.log(error);
+      },
+    }
+  );
+
+  const print = useMutation(
+    async (data) => {
+      const repsonse = await fetch("http://localhost:4000/print", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ filename: getFileName(imageName) }),
+      });
+      return repsonse;
+    },
+    {
+      onSuccess: (data) => {
+        setSnackbarMessage("Printing");
+        setSnackbarSeverity("success");
+        setSnackbarOpen(true);
+      },
+      onError: (error) => {
+        setSnackbarMessage("Image Failed to Print");
         setSnackbarSeverity("error");
         setSnackbarOpen(true);
         console.log(error);
@@ -140,6 +168,12 @@ const OutputDialog: React.FC<OutputDialogProps> = ({
     sendToTVRequest.mutate();
   };
 
+  const sendToPrinter = () => {
+    console.log("send to printer");
+    setSendToPrinterDialog(false);
+    print.mutate();
+  };
+
   const sendEmail = (emailAddress: string) => {
     console.log("Sending Email");
     console.log("emailAddress", emailAddress);
@@ -206,7 +240,7 @@ const OutputDialog: React.FC<OutputDialogProps> = ({
               <JumpingFloatingButton
                 onClick={() => setEmailDialogOpen(true)}
                 positionBottom="8rem"
-                positionLeft="42%"
+                positionLeft="38%"
                 tooltip="Email Image"
               >
                 <EmailIcon sx={{ height: "5rem", width: "5rem" }} />
@@ -215,10 +249,19 @@ const OutputDialog: React.FC<OutputDialogProps> = ({
               <JumpingFloatingButton
                 onClick={() => setSendToTVDialogOpen(true)}
                 positionBottom="8rem"
-                positionLeft="52%"
+                positionLeft="48%"
                 tooltip="Send to TV"
               >
                 <CastIcon sx={{ height: "5rem", width: "5rem" }} />
+              </JumpingFloatingButton>
+
+              <JumpingFloatingButton
+                onClick={() => setSendToPrinterDialog(true)}
+                positionBottom="8rem"
+                positionLeft="58%"
+                tooltip="Send to Printer"
+              >
+                <PrintIcon sx={{ height: "5rem", width: "5rem" }} />
               </JumpingFloatingButton>
 
               <JumpingFloatingButton
@@ -250,6 +293,16 @@ const OutputDialog: React.FC<OutputDialogProps> = ({
         message="Click send to be displayed on the TV"
         primeActionButtonText="Send"
         handlePrimeAction={sendToTV}
+        size="md"
+      />
+
+      <DecisionDialog
+        open={sendToPrinterDialogOpen}
+        onClose={() => setSendToPrinterDialog(false)}
+        title="Send to Printer"
+        message="Click to print image, please limit printing to one per guess as only supplies for 100 prints"
+        primeActionButtonText="Print"
+        handlePrimeAction={sendToPrinter}
         size="md"
       />
 
